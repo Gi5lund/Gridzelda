@@ -32,8 +32,8 @@ const playerobj={
         width: 18,
         height: 17
     },
-    regx: 10,
-    regy: 12,
+    regx: 16,
+    regy: 20,
     speed:100,
     moving: false,
     direction:undefined
