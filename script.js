@@ -128,34 +128,52 @@ const controls={
     }
 function moveplayer(deltaTime){
     playerobj.moving=false;
-    const newPos={
-        x:playerobj.x,
-        y:playerobj.y
-    }
-    if(controls.up){
-        playerobj.moving=true;
+    const diagonalspeed=playerobj.speed*Math.sqrt(2)/2;
+    let moving=false;
+    let newX=playerobj.x;
+    let newY=playerobj.y;
+    if(controls.up && !controls.down){
+        moving=true;
         playerobj.direction="up";
-        newPos.y-=playerobj.speed*deltaTime;
-    }
-      if(controls.down){
-        playerobj.moving=true;
+        newY-=playerobj.speed*deltaTime;
+    }else if(controls.down && !controls.up){
+        moving=true;
+        newY+=playerobj.speed*deltaTime;
         playerobj.direction="down";
-        newPos.y+=playerobj.speed*deltaTime;
+        
     }
-    if(controls.left){
-        playerobj.moving=true;
+    if(controls.left && !controls.right){
+        moving=true;
         playerobj.direction="left";
-        newPos.x-=playerobj.speed*deltaTime;
-    }  if(controls.right){
-        playerobj.moving=true;
+        newX-=playerobj.speed*deltaTime;
+    } else if(controls.right && !controls.left){
+        moving=true;       
         playerobj.direction="right";
-        newPos.x+=playerobj.speed*deltaTime;
+        newX+=playerobj.speed*deltaTime;
     }
-    if(validposition(newPos)){
-        playerobj.x=newPos.x;
-        playerobj.y=newPos.y;
+    if((controls.up || controls.down) && (controls.left || controls.right)){
+        newX=playerobj.x;
+        newY=playerobj.y;
+        if(controls.up){
+            newY-=diagonalspeed*deltaTime;
+        }else{
+            newY+=diagonalspeed*deltaTime;
+        }
+        if(controls.left){
+            newX-=diagonalspeed*deltaTime;
+        }else{
+            newX+=diagonalspeed*deltaTime;
+        }
+    }
+    if(moving){
+    if(validposition({x:newX,y:newY})){
+        playerobj.x=newX;
+        playerobj.y=newY;
+        playerobj.moving=true;
     }else{
-        playerobj.moving=false;    
+        playerobj.moving=false; 
+        
+        }
     }
 }
 function validposition(pos){
@@ -189,23 +207,16 @@ function displayPlayerAnimation(){
   //  console.log("displayPlayAnimation");
     const visualPlayer=document.querySelector("#player");
     if(!playerobj.moving){
-        visualPlayer.classList.remove("animate");}
+        visualPlayer.classList.remove("animate");
+    }
         else if(!visualPlayer.classList.contains("animate")){
             visualPlayer.classList.add("animate");
-
         }
         if(playerobj.direction && !visualPlayer.classList.contains(playerobj.direction)){
             visualPlayer.classList.remove("up","down","left","right");
             visualPlayer.classList.add(playerobj.direction);
         }
-    // if(playerobj.moving){
-    //     // visualPlayer.classList.add("animate");
-    //     visualPlayer.classList.remove("up","down","left","right");
-    //     visualPlayer.classList.add(playerobj.direction);
-    // } else{
-    //     visualPlayer.classList.remove("animate");
-     
-    // }
+   
 
 }
 function createTiles(){
