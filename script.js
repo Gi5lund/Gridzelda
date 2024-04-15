@@ -154,6 +154,8 @@ function moveplayer(deltaTime){
     if(validposition(newPos)){
         playerobj.x=newPos.x;
         playerobj.y=newPos.y;
+    }else{
+        playerobj.moving=false;    
     }
 }
 function validposition(pos){
@@ -186,14 +188,24 @@ function validposition(pos){
 function displayPlayerAnimation(){
   //  console.log("displayPlayAnimation");
     const visualPlayer=document.querySelector("#player");
-    if(playerobj.moving){
-        visualPlayer.classList.add("animate");
-        visualPlayer.classList.remove("up","down","left","right");
-        visualPlayer.classList.add(playerobj.direction);
-    } else{
-        visualPlayer.classList.remove("animate");
+    if(!playerobj.moving){
+        visualPlayer.classList.remove("animate");}
+        else if(!visualPlayer.classList.contains("animate")){
+            visualPlayer.classList.add("animate");
+
+        }
+        if(playerobj.direction && !visualPlayer.classList.contains(playerobj.direction)){
+            visualPlayer.classList.remove("up","down","left","right");
+            visualPlayer.classList.add(playerobj.direction);
+        }
+    // if(playerobj.moving){
+    //     // visualPlayer.classList.add("animate");
+    //     visualPlayer.classList.remove("up","down","left","right");
+    //     visualPlayer.classList.add(playerobj.direction);
+    // } else{
+    //     visualPlayer.classList.remove("animate");
      
-    }
+    // }
 
 }
 function createTiles(){
