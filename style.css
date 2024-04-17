@@ -118,3 +118,20 @@ body {
     translate: var(--regx) var(--regy);
 
 }
+#items {
+    grid-area: 1 / 1;
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(var(--GRID_WIDTH), var(--TILE_SIZE));
+    grid-template-rows: repeat(var(--GRID_HEIGHT), var(--TILE_SIZE));
+}
+.item {
+    width: var(--TILE_SIZE);
+    aspect-ratio: 1 / 1;
+    background-size: 100%;
+    image-rendering: pixelated;
+    grid-area: calc(var(--row) + 1) / calc(var(--col) + 1);
+}
+.item.gold {
+    background-image: url('images/simple-assets/images/items/gold.png');
+  }

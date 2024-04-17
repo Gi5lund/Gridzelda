@@ -3,6 +3,7 @@ window.addEventListener("load",start);
 function start(){
     console.log("start");
     createTiles();
+    createItems();
     displayTiles();
     setupEventlisteners();
    
@@ -20,7 +21,7 @@ function setupEventlisteners() {
        removeControl(key);
     });
 }
-let lastTimestamp=0;
+
 /*  MODEL   */
 
 const playerobj={
@@ -39,30 +40,42 @@ const playerobj={
     direction:undefined
 }
 const tiles=[
-    [0,0,0,0,0,0,4,0,0,2,0,2,2,0,0,1,],
-    [0,0,0,1,0,0,0,0,0,2,0,0,2,0,0,1,],
-    [0,0,6,6,6,6,6,4,0,2,0,0,2,0,0,1,],
-    [0,4,6,0,0,0,6,4,4,2,2,3,2,0,0,1,],
-    [6,6,6,0,0,0,6,6,6,6,6,6,6,0,0,1,],
-    [0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,1,],
-    [5,5,0,4,1,1,4,0,6,0,0,0,0,0,0,1,],
-    [5,0,0,1,1,1,1,0,6,0,0,0,0,0,0,1,],
-    [5,0,0,4,1,1,4,0,6,0,0,0,0,0,0,1,]
+    [0,0,0,0,0,0,4,0,0,2,0,2,2,0,0,1],
+    [0,0,0,4,0,0,0,0,0,2,0,0,2,0,0,1],
+    [0,0,6,6,6,6,6,4,0,2,0,0,2,0,0,1],
+    [0,4,6,0,0,0,6,4,4,2,2,3,2,0,0,1],
+    [6,6,6,0,0,0,6,6,6,6,6,6,6,0,0,1],
+    [0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,1],
+    [5,5,0,4,1,1,4,0,6,0,0,0,0,0,0,1],
+    [5,0,0,1,1,1,1,0,6,0,0,0,0,0,0,1],
+    [5,0,0,4,1,1,4,0,6,0,0,0,0,0,0,1]
+]
+const itemsGrid=[
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 ]
 const GRID_HEIGHT=tiles.length;
 const GRID_WIDTH=tiles[0].length;
 const TILE_SIZE=48;
-function getTileAtCoord({ row, col }) {
-   
+
+function getTileAtCoord({ row, col }) {   
     return tiles[row][col];
 }
+
 function coordFromPos({x,y}){
     return{
         row:Math.floor(y/TILE_SIZE),
         col:Math.floor(x/TILE_SIZE)
     }
-
 }
+
 function getTilesUnderPlayer(player){
 const tilesunderplayer=[];
 const topleft={x:player.x-player.regx+player.hitbox.x,y:player.y};
@@ -77,11 +90,10 @@ function displayPlayerAtPosition(){
  //   console.log(playerobj)
     return true;
 }
-
+let lastTimestamp=0;
 function tick(timestamp){
   //  console.log("tick");
-    requestAnimationFrame(tick);
-    
+    requestAnimationFrame(tick);    
     const deltaTime=(timestamp-lastTimestamp)/1000;
     lastTimestamp=timestamp;
   //  console.log("deltaTime",deltaTime);
@@ -90,12 +102,14 @@ function tick(timestamp){
     displayPlayerAnimation();
     showDebugging();
 }
+
 const controls={
     up:false,
     down:false,
     left:false,
     right:false
 }
+
  function setControls(key){
     if(key==="ArrowUp"){
         controls.up=true;
@@ -109,7 +123,7 @@ const controls={
     if(key==="ArrowRight"){
         controls.right=true;
     }
-    console.log(controls);
+   // console.log(controls);
  }
     function removeControl(key){
         if(key==="ArrowUp"){
@@ -124,8 +138,9 @@ const controls={
         if(key==="ArrowRight"){
             controls.right=false;
         }
-        console.log(controls);
+       // console.log(controls);
     }
+
 function moveplayer(deltaTime){
     playerobj.moving=false;
     const diagonalspeed=playerobj.speed*Math.sqrt(2)/2;
@@ -205,11 +220,10 @@ function validposition(pos){
 /*  VIEW   */
 function displayPlayerAnimation(){
   //  console.log("displayPlayAnimation");
-    const visualPlayer=document.querySelector("#player");
-    if(!playerobj.moving){
-        visualPlayer.classList.remove("animate");
-    }
-        else if(!visualPlayer.classList.contains("animate")){
+     const visualPlayer=document.querySelector("#player");
+        if(!playerobj.moving){
+            visualPlayer.classList.remove("animate");
+        } else if(!visualPlayer.classList.contains("animate")){
             visualPlayer.classList.add("animate");
         }
         if(playerobj.direction && !visualPlayer.classList.contains(playerobj.direction)){
@@ -219,7 +233,9 @@ function displayPlayerAnimation(){
    
 
 }
+
 function createTiles(){
+    const gamefield=document.querySelector("#gamefield");
     const background=document.querySelector("#background");
  for(let i=0;i<GRID_HEIGHT;i++){
      for(let j=0;j<GRID_WIDTH;j++){
@@ -228,9 +244,27 @@ function createTiles(){
          background.appendChild(tile);
      }
  }
- background.style.setProperty("--GRID_WIDTH",GRID_WIDTH);
- background.style.setProperty("--GRID_HEIGHT",GRID_HEIGHT);
- background.style.setProperty("--TILE_SIZE",TILE_SIZE+"px")
+ gamefield.style.setProperty("--GRID_WIDTH",GRID_WIDTH);
+ gamefield.style.setProperty("--GRID_HEIGHT",GRID_HEIGHT);
+ gamefield.style.setProperty("--TILE_SIZE",TILE_SIZE+"px")
+}
+
+function createItems(){
+const visualitems=document.querySelector("#items");
+    for(let row=0;row<GRID_HEIGHT;row++){
+        for(let col=0;GRID_WIDTH;col++){
+            const itemtype=itemsGrid[row][col];
+            if(itemtype!==0){
+            const visualitem=document.createElement("div");
+
+            visualitem.classList.add("item");
+            visualitem.classList.add("gold");
+            visualitem.style.setProperty("--row",row);
+            visualitem.style.setProperty("--col",col);
+            visualitems.appendChild(visualitem);
+            }
+        }
+    }
 }
  function displayTiles(){
 const visualTiles=document.querySelectorAll("#background .tile");
