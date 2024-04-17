@@ -1,10 +1,10 @@
 "use strict"
 window.addEventListener("load",start);
 function start(){
-    console.log("start");
-    createTiles();
-    createItems();
+    console.log("js kører");
+    createTiles();    
     displayTiles();
+    createItems();
     setupEventlisteners();
    
   requestAnimationFrame(tick);
@@ -92,7 +92,7 @@ function displayPlayerAtPosition(){
 }
 let lastTimestamp=0;
 function tick(timestamp){
-  //  console.log("tick");
+   console.log("tick");
     requestAnimationFrame(tick);    
     const deltaTime=(timestamp-lastTimestamp)/1000;
     lastTimestamp=timestamp;
@@ -254,9 +254,9 @@ const visualitems=document.querySelector("#items");
     for(let row=0;row<GRID_HEIGHT;row++){
         for(let col=0;GRID_WIDTH;col++){
             const itemtype=itemsGrid[row][col];
-            if(itemtype!==0){
             const visualitem=document.createElement("div");
-
+            if(itemtype===1){
+            
             visualitem.classList.add("item");
             visualitem.classList.add("gold");
             visualitem.style.setProperty("--row",row);
