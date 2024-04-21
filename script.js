@@ -53,13 +53,13 @@ const tiles=[
 const itemsGrid=[
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ]
 const GRID_HEIGHT=tiles.length;
 const GRID_WIDTH=tiles[0].length;
@@ -75,10 +75,14 @@ function coordFromPos({x,y}){
         col:Math.floor(x/TILE_SIZE)
     }
 }
+function getTileCoordUnder(playerobj){
+    // const {x,y}=playerobj;
+    return coordFromPos({x:playerobj.x-playerobj.regx,y:playerobj.y-playerobj.regy});
+}
 
-function getTilesUnderPlayer(player){
+function getTilesUnderPlayer(playerobj){
 const tilesunderplayer=[];
-const topleft={x:player.x-player.regx+player.hitbox.x,y:player.y};
+const topleft={x:playerobj.x-player.regx+player.hitbox.x,y:player.y};
 const topright={x:player.x-player.regx+player.hitbox.x+player.hitbox.width+player.hitbox.x,y:player.y};
 const bottomleft={x:player.x-player.regx+player.hitbox.x,y:player.y+player.hitbox.height};//tjek herfra
 }
@@ -98,6 +102,7 @@ function tick(timestamp){
     lastTimestamp=timestamp;
   //  console.log("deltaTime",deltaTime);
     moveplayer(deltaTime);
+    // checkForItems();
     displayPlayerAtPosition();
     displayPlayerAnimation();
     showDebugging();
@@ -213,7 +218,17 @@ function validposition(pos){
     return true;
 }
 
+// function checkForItems(){
+//     //find all items touching the player
+//     const items= getItemsUnderPlayer();
+//     if(items.length>0){
+//         //only do something if there are items touching
+//         console.log(`there are ${items.length} items touching player `)
+//     }
+// }
+// function getItemsUnderPlayer(){
 
+// }
    
 
 
@@ -252,7 +267,7 @@ function createTiles(){
 function createItems(){
 const visualitems=document.querySelector("#items");
     for(let row=0;row<GRID_HEIGHT;row++){
-        for(let col=0;GRID_WIDTH;col++){
+        for(let col=0;col<GRID_WIDTH;col++){
             const itemtype=itemsGrid[row][col];
             if(itemtype!==0){
             const visualitem=document.createElement("div");
