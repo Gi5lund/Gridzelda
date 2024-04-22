@@ -135,3 +135,11 @@ body {
 .item.gold {
     background-image: url('images/simple-assets/images/items/gold.png');
   }
+  .show-hitbox::after{
+    content:"";
+    position: absolute;
+    width: var(--hitboxW);
+    height: var(--hitboxH);
+    translate: var(--hitboxX) var(--hitboxY);
+    outline: 2px solid hotpink;
+  }

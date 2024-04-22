@@ -25,13 +25,13 @@ function setupEventlisteners() {
 /*  MODEL   */
 
 const playerobj={
-    x: 0,
-    y: 0,
+    x: 20,
+    y: 20,
     hitbox:{
-        x: 4,
-        y: 7,
-        width: 18,
-        height: 17
+        x: 5,
+        y: 8,
+        width: 23,
+        height: 28
     },
     regx: 16,
     regy: 20,
@@ -80,11 +80,17 @@ function getTileCoordUnder(playerobj){
     return coordFromPos({x:playerobj.x-playerobj.regx,y:playerobj.y-playerobj.regy});
 }
 
-function getTilesUnderPlayer(playerobj){
-const tilesunderplayer=[];
-const topleft={x:playerobj.x-player.regx+player.hitbox.x,y:player.y};
-const topright={x:player.x-player.regx+player.hitbox.x+player.hitbox.width+player.hitbox.x,y:player.y};
-const bottomleft={x:player.x-player.regx+player.hitbox.x,y:player.y+player.hitbox.height};//tjek herfra
+function getTilesUnderPlayer(playerobj,newPos={x:playerobj.x,y:playerobj.y}){
+const topleft={x:newPos.x-playerobj.regx+playerobj.hitbox.x,
+    y:newPos.y-playerobj.regy+playerobj.hitbox.y};
+ const topLeft=coordFromPos({x:newPos.x-playerobj.regx+playerobj.hitbox.x,
+    y:newPos.y-playerobj.regy+playerobj.hitbox.y});
+ const topright=coordFromPos({x:topleft.x+playerobj.hitbox.width,y:topleft.y});
+ const bottomleft=coordFromPos({x:topleft.x,y:topleft.y+playerobj.hitbox.height});//
+ const bottomright=coordFromPos({x:topleft.x+playerobj.hitbox.width,y:topleft.y+playerobj.hitbox.height});
+
+ return [topLeft,topright,bottomleft,bottomright];
+
 }
 
 function displayPlayerAtPosition(){
@@ -186,7 +192,7 @@ function moveplayer(deltaTime){
         }
     }
     if(moving){
-    if(validposition({x:newX,y:newY})){
+    if(canMovePlayertoPos(playerobj,{x:newX,y:newY})){
         playerobj.x=newX;
         playerobj.y=newY;
         playerobj.moving=true;
@@ -196,8 +202,8 @@ function moveplayer(deltaTime){
         }
     }
 }
-function validposition(pos){
-    const {row,col}=coordFromPos(pos);
+function validposition({row,col}){
+  //  const {row,col}=coordFromPos(pos);
     if(row<0 || col<0 || row>=GRID_HEIGHT || col>=GRID_WIDTH){
         return false;
     }
@@ -216,6 +222,10 @@ function validposition(pos){
             break;
     }
     return true;
+}
+function canMovePlayertoPos(player,pos){
+const coords=getTilesUnderPlayer(player,pos);
+return coords.every(validposition);
 }
 
 // function checkForItems(){
@@ -321,18 +331,17 @@ for(let row=0;row<GRID_HEIGHT;row++){
  }
 //#region DEBUGGING
 function showDebugging(){
-    showDebugTileUnderplayer();
+    showDebugTilesUnderplayer();
     showDebugPlayerRect();
     showDebugPlayerRegistrationPoint();
+    showDebugPlayerHitbox();
 }
-let lastPlayerCoord={row:0,col:0};
-function showDebugTileUnderplayer(){
-    const coord=coordFromPos(playerobj);
-    if(coord.row!==lastPlayerCoord?.row || coord.col!==lastPlayerCoord?.col){
-        unhighlightTile(lastPlayerCoord);
-   highlightTile(coord);
-    }
-    lastPlayerCoord=coord;
+let highlightedTiles=[];
+function showDebugTilesUnderplayer(){
+    highlightedTiles.forEach(unhighlightTile);
+    const tileCoords=getTilesUnderPlayer(playerobj);
+    tileCoords.forEach(highlightTile);
+    highlightedTiles=tileCoords;
 }
 function showDebugPlayerRect(){
     const visualPlayer=document.querySelector("#player");
@@ -358,6 +367,16 @@ function unhighlightTile(cord){
 const visualTiles=document.querySelectorAll("#background .tile");
 const visualTile=visualTiles[cord.row*GRID_WIDTH+cord.col];
 visualTile.classList.remove("highlight");
+}
+function showDebugPlayerHitbox(){
+    const visualPlayer=document.querySelector("#player");
+    if(!visualPlayer.classList.contains("show-hitbox")){
+    visualPlayer.classList.add("show-hitbox");
+    }
+    visualPlayer.style.setProperty("--hitboxX",playerobj.hitbox.x+"px");
+    visualPlayer.style.setProperty("--hitboxY",playerobj.hitbox.y+"px");
+    visualPlayer.style.setProperty("--hitboxW",playerobj.hitbox.width+"px"),
+    visualPlayer.style.setProperty("--hitboxH",playerobj.hitbox.height+"px");
 }
 
 //#endregion
