@@ -25,6 +25,7 @@ function setupEventlisteners() {
 /*  MODEL   */
 
 const playerobj={
+    isTaking:false,
     x: 20,
     y: 20,
     hitbox:{
@@ -37,7 +38,7 @@ const playerobj={
     regy: 20,
     speed:100,
     moving: false,
-    direction:"down"
+    direction:undefined
 }
 const tiles=[
     [0,0,0,0,0,0,4,0,0,2,0,2,2,0,0,1],
@@ -122,7 +123,8 @@ const controls={
     down:false,
     left:false,
     right:false,
-    use:false
+    use:false,
+    accellerate: false
 }
 
  function setControls(key){
@@ -137,6 +139,12 @@ const controls={
     }
     if(key==="ArrowRight"){
         controls.right=true;
+    }
+    if(key==="e"){
+        controls.use=true;
+    }
+    if(key==="w"){
+        controls.accellerate=true;
     }
    // console.log(controls);
  }
@@ -153,6 +161,12 @@ const controls={
         if(key==="ArrowRight"){
             controls.right=false;
         }
+        if(key==="e"){
+            controls.use=false;
+        }
+        if(key==="w"){
+            controls.accellerate=false;
+        }
        // console.log(controls);
     }
 
@@ -162,6 +176,11 @@ function moveplayer(deltaTime){
     let moving=false;
     let newX=playerobj.x;
     let newY=playerobj.y;
+    if(controls.accellerate){
+        playerobj.speed=200;
+    }else{
+        playerobj.speed=100;
+    }
     if(controls.up && !controls.down){
         moving=true;
         playerobj.direction="up";
@@ -235,9 +254,13 @@ return coords.every(validposition);
 function checkForItems(){
     //find all items touching the player
     const items= getItemsUnderPlayer(playerobj);
-    if(items.length>0){
+    if(items.length>0 && controls.use && !playerobj.isTaking){
+        playerobj.isTaking=true;
        items.forEach(takeItem);
-       console.log(`There are ${items.length} items under player!`);
+      
+    }
+    if(playerobj.isTaking && !controls.use){
+        playerobj.isTaking=false;
     }
 }
 function getItemsUnderPlayer(playerobj,pos){
@@ -339,7 +362,7 @@ for(let row=0;row<GRID_HEIGHT;row++){
 
  function takeItem(coords){
     const itemValue=itemsGrid[coords.row][coords.col];
-    if(itemValue!==0){
+    if(itemValue!==0 ){
         itemsGrid[coords.row][coords.col]=0;
         const visualItem=visualItemsGrid[coords.row][coords.col];
         
