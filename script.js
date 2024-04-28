@@ -13,7 +13,7 @@ function start(){
 function setupEventlisteners() {
     document.addEventListener("keydown", (event) => {
     const key=event.key;
-     console.log("keypressed: ",key); 
+    //  console.log("keypressed: ",key); 
     setControls(key);   
     });
     document.addEventListener("keyup", (event) => {
@@ -37,7 +37,7 @@ const playerobj={
     regy: 20,
     speed:100,
     moving: false,
-    direction:undefined
+    direction:"down"
 }
 const tiles=[
     [0,0,0,0,0,0,4,0,0,2,0,2,2,0,0,1],
@@ -61,6 +61,7 @@ const itemsGrid=[
     [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ]
+const visualItemsGrid=[];
 const GRID_HEIGHT=tiles.length;
 const GRID_WIDTH=tiles[0].length;
 const TILE_SIZE=48;
@@ -81,6 +82,7 @@ function getTileCoordUnder(playerobj){
 }
 
 function getTilesUnderPlayer(playerobj,newPos={x:playerobj.x,y:playerobj.y}){
+   
 const topleft={x:newPos.x-playerobj.regx+playerobj.hitbox.x,
     y:newPos.y-playerobj.regy+playerobj.hitbox.y};
  const topLeft=coordFromPos({x:newPos.x-playerobj.regx+playerobj.hitbox.x,
@@ -108,9 +110,10 @@ function tick(timestamp){
     lastTimestamp=timestamp;
   //  console.log("deltaTime",deltaTime);
     moveplayer(deltaTime);
-    // checkForItems();
+     checkForItems();
     displayPlayerAtPosition();
     displayPlayerAnimation();
+
     showDebugging();
 }
 
@@ -118,7 +121,8 @@ const controls={
     up:false,
     down:false,
     left:false,
-    right:false
+    right:false,
+    use:false
 }
 
  function setControls(key){
@@ -228,17 +232,18 @@ const coords=getTilesUnderPlayer(player,pos);
 return coords.every(validposition);
 }
 
-// function checkForItems(){
-//     //find all items touching the player
-//     const items= getItemsUnderPlayer();
-//     if(items.length>0){
-//         //only do something if there are items touching
-//         console.log(`there are ${items.length} items touching player `)
-//     }
-// }
-// function getItemsUnderPlayer(){
+function checkForItems(){
+    //find all items touching the player
+    const items= getItemsUnderPlayer(playerobj);
+    if(items.length>0){
+       items.forEach(takeItem);
+       console.log(`There are ${items.length} items under player!`);
+    }
+}
+function getItemsUnderPlayer(playerobj,pos){
 
-// }
+return getTilesUnderPlayer(playerobj,pos).filter(({row,col})=> itemsGrid[row][col]!=0);
+}
    
 
 
@@ -277,6 +282,7 @@ function createTiles(){
 function createItems(){
 const visualitems=document.querySelector("#items");
     for(let row=0;row<GRID_HEIGHT;row++){
+        visualItemsGrid[row]=[];
         for(let col=0;col<GRID_WIDTH;col++){
             const itemtype=itemsGrid[row][col];
             if(itemtype!==0){
@@ -287,6 +293,7 @@ const visualitems=document.querySelector("#items");
             visualitem.style.setProperty("--row",row);
             visualitem.style.setProperty("--col",col);
             visualitems.appendChild(visualitem);
+            visualItemsGrid[row][col]=visualitem;
             }
         }
     }
@@ -328,6 +335,18 @@ for(let row=0;row<GRID_HEIGHT;row++){
              return "grass";
              break;
      }
+ }
+
+ function takeItem(coords){
+    const itemValue=itemsGrid[coords.row][coords.col];
+    if(itemValue!==0){
+        itemsGrid[coords.row][coords.col]=0;
+        const visualItem=visualItemsGrid[coords.row][coords.col];
+        
+        visualItem.classList.add("pick-up")
+        document.querySelector("#sound_coins").play();
+        console.log("item taken",itemValue);
+    }
  }
 //#region DEBUGGING
 function showDebugging(){
