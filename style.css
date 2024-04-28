@@ -156,3 +156,29 @@ body {
     100%{transform: scale(0.5);
     opacity: 0;}
   }
+  #shots{
+    grid-area: 1 / 1;
+    position: relative;
+  }
+.arrow{
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    aspect-ratio: 1/1;
+    background-image: url('images/simple-assets/images/weapons/arrow.png');
+    background-size: 100% 100%;
+    image-rendering: pixelated;
+}
+.arrow.right{
+    rotate: 90deg;
+}
+.arrow.left{
+   rotate: -90deg;
+}
+.arrow.up{
+    rotate: none;
+}
+.arrow.down{
+    rotate: 180deg;
+}

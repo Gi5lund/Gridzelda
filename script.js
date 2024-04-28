@@ -26,6 +26,7 @@ function setupEventlisteners() {
 
 const playerobj={
     isTaking:false,
+    firing:false,
     x: 20,
     y: 20,
     hitbox:{
@@ -111,9 +112,22 @@ function tick(timestamp){
     lastTimestamp=timestamp;
   //  console.log("deltaTime",deltaTime);
     moveplayer(deltaTime);
+    if(controls.fire && !playerobj.firing){
+        playerobj.firing=true;
+      //  console.log("fire");
+        fireShot();
+        // document.querySelector("#sound_shot").play();    
+    }
+    if(playerobj.firing && !controls.fire){
+        playerobj.firing=false;
+      //  console.log("stop fire");
+    }
+
+    moveShots(deltaTime);
      checkForItems();
     displayPlayerAtPosition();
     displayPlayerAnimation();
+    displayShots();
 
     showDebugging();
 }
@@ -124,7 +138,8 @@ const controls={
     left:false,
     right:false,
     use:false,
-    accellerate: false
+    accellerate: false,
+    fire:false
 }
 
  function setControls(key){
@@ -145,6 +160,9 @@ const controls={
     }
     if(key==="w"){
         controls.accellerate=true;
+    }
+    if(key===" "){
+        controls.fire=true;
     }
    // console.log(controls);
  }
@@ -167,8 +185,40 @@ const controls={
         if(key==="w"){
             controls.accellerate=false;
         }
+        if(key===" "){
+            controls.fire=false;
+        }
        // console.log(controls);
     }
+    const shots=[];
+    function fireShot(){
+        const divShot=document.createElement("div");
+        divShot.classList.add("arrow");
+        divShot.classList.add(playerobj.direction);
+
+        const shotModel={
+            x:playerobj.x,//-playerobj.regx,
+            y:playerobj.y,//-playerobj.regy,
+            regX:8,
+            regY:8,
+            direction:playerobj.direction,
+            speed:300,
+           view:divShot
+        };
+        if(playerobj.direction==="up"){
+            shotModel.regY=4;
+        } else if(playerobj.direction==="down"){
+            shotModel.regY=12;
+        } else if(playerobj.direction==="left"){
+            shotModel.regX=2;}
+         else  if(playerobj.direction==="right"){
+            shotModel.regX=12;
+        }
+       shots.push(shotModel);
+       const shotsDiv=document.querySelector("#shots");
+       shotsDiv.appendChild(divShot);
+    }
+    
 
 function moveplayer(deltaTime){
     playerobj.moving=false;
@@ -268,7 +318,61 @@ function getItemsUnderPlayer(playerobj,pos){
 return getTilesUnderPlayer(playerobj,pos).filter(({row,col})=> itemsGrid[row][col]!=0);
 }
    
-
+function canMoveShotToPos(newPos){
+    const coord=coordFromPos(newPos);
+    return canShotMoveToCoord(coord)
+}
+function canShotMoveToCoord({row,col}){
+    if(row<0 || col<0 || row>=GRID_HEIGHT || col>=GRID_WIDTH){
+        return false;
+    }
+   const tileValue=getTileAtCoord({row,col});
+   switch(tileValue){
+       case 0:
+       case 6:
+       case 1:
+           return true;
+           break;
+       case 3:
+       case 2:
+       case 4:
+       case 5:
+           return false;
+           break;
+   }
+   return true;
+}
+function moveShots(deltaTime){
+   for(let i=shots.length-1;i>=0;i--){
+       const shot=shots[i];
+       let newX=shot.x;
+      let newY= shot.y
+       
+       
+        switch(shot.direction){
+            case "up":
+                newY-=shot.speed*deltaTime;
+                break;
+            case "down":
+                newY+=shot.speed*deltaTime;
+                break;
+            case "left":
+                newX-=shot.speed*deltaTime;
+                break;
+            case "right":
+                newX+=shot.speed*deltaTime;
+                break;           
+        }
+        if(canMoveShotToPos({x:newX,y:newY})){
+            shot.x=newX;
+            shot.y=newY;
+        } else {
+            shots.splice(i,1);
+          // shot.view.remove();
+         }
+   }
+}
+    
 
 /*  VIEW   */
 function displayPlayerAnimation(){
@@ -370,6 +474,12 @@ for(let row=0;row<GRID_HEIGHT;row++){
         document.querySelector("#sound_coins").play();
         console.log("item taken",itemValue);
     }
+ }
+ function displayShots(){
+    shots.forEach((shot)=>{
+        const visualShot=shot.view;
+    visualShot.style.transform=`translate(${shot.x-shot.regX}px, ${shot.y-shot.regY}px)`;
+    });
  }
 //#region DEBUGGING
 function showDebugging(){
