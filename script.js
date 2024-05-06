@@ -129,7 +129,7 @@ function tick(timestamp){
     displayPlayerAnimation();
     displayShots();
 
-    showDebugging();
+  //  showDebugging();
 }
 
 const controls={
