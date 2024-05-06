@@ -197,22 +197,28 @@ const controls={
         divShot.classList.add(playerobj.direction);
 
         const shotModel={
-            x:playerobj.x,//-playerobj.regx,
-            y:playerobj.y,//-playerobj.regy,
+            x:playerobj.x-playerobj.regx,
+            y:playerobj.y-playerobj.regy,
             regX:8,
             regY:8,
-            direction:playerobj.direction,
+            direction: undefined,//playerobj.direction,
             speed:300,
            view:divShot
         };
         if(playerobj.direction==="up"){
             shotModel.regY=4;
-        } else if(playerobj.direction==="down"){
+            shotModel.direction="up"
+        }  if(playerobj.direction==="down"){
             shotModel.regY=12;
-        } else if(playerobj.direction==="left"){
-            shotModel.regX=2;}
-         else  if(playerobj.direction==="right"){
+            shotModel.direction="down";
+        } if(playerobj.direction==="left"){
+            shotModel.regX=4;
+            shotModel.direction="left";
+        }
+
+          if(playerobj.direction==="right"){
             shotModel.regX=12;
+            shotModel.direction="right";
         }
        shots.push(shotModel);
        const shotsDiv=document.querySelector("#shots");
@@ -354,7 +360,7 @@ function moveShots(deltaTime){
                 newY-=shot.speed*deltaTime;
                 break;
             case "down":
-                newY+=shot.speed*deltaTime;
+                newY+=shot.speed*deltaTime;  //her mangler plus
                 break;
             case "left":
                 newX-=shot.speed*deltaTime;
@@ -478,8 +484,9 @@ for(let row=0;row<GRID_HEIGHT;row++){
  function displayShots(){
     shots.forEach((shot)=>{
         const visualShot=shot.view;
-    visualShot.style.transform=`translate(${shot.x-shot.regX}px, ${shot.y-shot.regY}px)`;
+    visualShot.style.translate=`${shot.x-shot.regX}px ${shot.y-shot.regY}px`;
     });
+    return true;
  }
 //#region DEBUGGING
 function showDebugging(){
